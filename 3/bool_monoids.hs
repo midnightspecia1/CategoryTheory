@@ -32,5 +32,21 @@ instance Semigroup NEqual where
 instance Monoid NEqual where
     mempty = NEqual False
        
+data SMT = Zero | One | Two deriving Show
+instance Semigroup SMT where 
+    (<>) :: SMT -> SMT -> SMT
+    One  <> Two  = Zero
+    One  <> One  = Two
+    One  <> Zero = One
+    Zero <> Two  = Two
+    Zero <> One  = One
+    Zero <> Zero = Zero
+    Two  <> Zero = Two
+    Two  <> One  = Zero
+    Two  <> Two  = Two
 
+instance Monoid SMT where
+    mempty :: SMT
+    mempty = Zero
+    
 
