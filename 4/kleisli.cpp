@@ -5,7 +5,9 @@
 #include <algorithm>
 #include <vector>
 
-std::string logger;
+using namespace std;
+
+string logger;
 
 // here impure function that chages global state
 // bool negate(bool b)
@@ -14,25 +16,25 @@ std::string logger;
 //     return !b;
 // }
 
-std::pair<bool, std::string> negate(bool b, std::string logger)
+pair<bool, string> negate(bool b, string logger)
 {
     return make_pair(!b, logger + "Not so! ");
 }
 
 // the thing with this version is that the log would be agregated between calls
-// std::pair<bool, std::string> negate(bool b) 
+// pair<bool, string> negate(bool b) 
 // {
 //     return make_pair(!b, "Not so! ");
 // }
 
-// std::vector<std::string> toWords(std::string s)
+// vector<string> toWords(string s)
 // {
 //     return words(s);
 // }
 
-std::vector<std::string> words(std::string s)
+vector<string> words(string s)
 {
-    std::vector<std::string> result{""};
+    vector<string> result{""};
     for (auto i = begin(s); i != end(s); ++i)
     {
         if(isspace(*i))
@@ -47,22 +49,22 @@ std::vector<std::string> words(std::string s)
 //making Writer that encapsulates pair with an arbitrary A and a string
 //this notation is kinda simmilar to type synonyms
 template<class A>
-using Writer = std::pair<A, std::string>;
+using Writer = pair<A, string>;
 
-Writer<std::string> toUpper(std::string s)
+Writer<string> toUpper(string s)
 {
-    std::string result;
-    int (*toupperp)(int) = &std::toupper;
-    std::transform(begin(s), end(s), std::back_inserter(result), toupperp);
+    string result;
+    int (*toupperp)(int) = &toupper;
+    transform(begin(s), end(s), back_inserter(result), toupperp);
     return make_pair(result, "toUpper ");
 }
 
-Writer<std::vector<std::string>> toWords(std::string s)
+Writer<vector<string>> toWords(string s)
 {
     return make_pair(words(s), "toWords ");
 }
 
-Writer<std::vector<std::string>> process(std::string s)
+Writer<vector<string>> process(string s)
 {
     auto p1 = toUpper(s);
     auto p2 = toWords(p1.first);
