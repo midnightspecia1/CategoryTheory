@@ -8,7 +8,7 @@
 -- a * (b + c) = (a * b) + (a * c)
 -- this property is also hold on sum and product types
 -- (a, Either b c) = Either (a, b) (a, c)
--- and ints up to isomorphism
+-- and its up to isomorphism
 
 prodToSum :: (a, Either b c) -> Either (a, b) (a, c)
 prodToSum (x, e) = 
@@ -55,3 +55,53 @@ data List a = Nil | Cons a (List a)
 -- this analogy goes deeper and leads to Curry-Hovard isomorphism
 
 
+-- 6.1 isomorphism between Maybe a and Either () a
+isoMtoE :: Maybe a -> Either () a
+isoMtoE m = 
+    case m of
+        Nothing -> Left ()
+        Just a -> Right a
+
+isoEtoM :: Either () a -> Maybe a
+isoEtoM e = 
+    case e of
+        Left () -> Nothing
+        Right a -> Just a
+
+-- 6.2
+data Shape = Circle Float
+           | Rect Float Float
+           | Square Float
+
+area :: Shape -> Float
+area (Circle r) = pi * r * r
+area (Rect d h) = d * h
+area (Square h) = h * h
+
+--implemented c++ interaface Shape, Rect and Circle objects
+
+-- 6.3
+circ :: Shape -> Float
+circ (Circle r) = 2.0 * pi * r
+circ (Rect d h) = 2.0 * (d + h)
+circ (Square h) = h * 4
+-- to implement this we dont touch the Shape type code
+-- in C++ i have to add circ method in the Shape class besides the overrides in each of the child classes
+
+-- 6.4
+-- to add new Shape in Haskell i edit the sum type Shape and edit all the methods that are patternmathing this type
+-- however in C++ i only need to create another class Square and implement all the needed methods
+
+-- 6.5
+-- a + a = a * 2
+-- Either a a = (a, Bool)
+
+s :: Either a a -> (a, Bool)
+s e = 
+    case e of
+        Left a -> (a, True)
+        Right a -> (a, False)
+
+p :: (a, Bool) -> Either a a
+p (a, True) = Left a
+p (a, False) = Right a
