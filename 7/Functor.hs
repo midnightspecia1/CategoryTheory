@@ -74,10 +74,21 @@ mis = Just [1, 2, 3]
 
 mis2 = (Prelude.fmap . Prelude.fmap) square mis 
 
--- 7.4 can we turn Maybe type constructor into the functor defining
+-- 7.4.1 can we turn Maybe type constructor into the functor defining
 -- fmap _ _ = Nothing
 -- we have to prove "the functor laws" that this fmap implementation preserve identity and composition
 -- identity
 --   id _   = _            -we have any value here
 -- fmap _ _ = Nothing      -but only nothing here - so already identity law not preserved
 
+-- 7.4.2 functor laws for reader functor
+-- IDENTITY
+--      id r          = r (r :: a -> b)
+-- fmap id r = id . r = r  identity law preserved
+-- COMPOSITION
+-- fmap (f . g) r = (fmap f . fmap g) r  -- f :: b -> c,  g :: a -> b
+-- f . g = h :: a -> c
+-- fmap h r = y :: r -> c
+--                   fmap g r = x :: r -> b
+--                   fmap f x = y :: r -> c
+-- composition preserved
