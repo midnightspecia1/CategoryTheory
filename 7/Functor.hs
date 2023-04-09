@@ -22,6 +22,7 @@
 -- image a = Maybe a
 -- image b = Maybe b
 -- image f = Maybe a -> Maybe b
+{-# LANGUAGE InstanceSigs #-}
 
 fmap :: (a -> b) -> Maybe a -> Maybe b
 fmap _ Nothing = Nothing
@@ -75,3 +76,8 @@ mis2 = (Prelude.fmap . Prelude.fmap) square mis
 
 -- 7.4 can we turn Maybe type constructor into the functor defining
 -- fmap _ _ = Nothing
+-- we have to prove "the functor laws" that this fmap implementation preserve identity and composition
+-- identity
+--   id _   = _            -we have any value here
+-- fmap _ _ = Nothing      -but only nothing here - so already identity law not preserved
+
