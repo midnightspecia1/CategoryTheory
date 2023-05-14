@@ -1,0 +1,12 @@
+--as an more general statement 
+--mapping that takes a pair of object a and b
+--and assigns to them set morphisms: hom-set C(a,b) is a functor
+-- (Cop x C) -> Set
+-- define action on morhpisms
+-- 1. morphism in (Cop x C) it is a pair of morphisms
+--    f :: a'-> a
+--    g :: b -> b'
+-- 2. lifting on that pair - function from C(a,b) -> C(a',b')
+--    picking any element from C(a,b) - h :: a -> b
+-- 3. g . h . f
+--    (a' -> a) -> (a -> b) -> (b -> b')
