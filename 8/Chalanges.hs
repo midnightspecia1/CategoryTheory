@@ -1,7 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 import Data.Bifunctor
-import Data.Functor.Identity (Identity)
-import Control.Applicative (Const)
+import Data.Functor.Identity (Identity (Identity))
 
 --8.9.1 Show that Pair a b is a bifunctor
 data Pair a b = Pair a b
@@ -61,5 +60,47 @@ instance Bifunctor Pair where
 -- Pair a (y b)                                 (second same)
 
 --8.9.2 Show Isomorphism with standart Maybe definition and the given desugared one
-data Maybe  a = Nothing | Just a                    -- standart
+--data Maybe  a = Nothing | Just a                    -- standart
 type Maybe' a = Either (Const () a) (Identity a)    -- desugared
+
+newtype Const c a = Const c
+
+instance Functor (Const c) where
+    fmap :: (a -> b) -> Const c a -> Const c b
+    fmap _ (Const a) = Const a
+
+maybeToEitherMaybe :: Maybe a -> Maybe' a
+maybeToEitherMaybe Nothing = Left (Const ())
+maybeToEitherMaybe (Just a) = Right (Identity a)
+
+eitherMaybeToMaybe :: Maybe' a -> Maybe a
+eitherMaybeToMaybe (Left (Const ())) = Nothing
+eitherMaybeToMaybe (Right (Identity a)) = Just a
+
+-- if this two functions inverse of each other we considering this
+-- maybeToEitherMaybe . eitherMaybeToMaybe = id
+-- eitherMaybeToMaybe . maybeToEitherMaybe = id
+
+-- we have only two variants of the input for both functions
+
+-- (maybeToEitherMaybe . eitherMaybeToMaybe) (Left (Const ())) = id (Left (Const ()))
+-- eitherMaybeToMaybe (Left (Const ())) = Nothing
+-- maybeToeitherMaybe Nothing = (Left (Const ()))         (1 same)
+-- id (Left (Const ())) = (Left (Const ()))               (1 same)  
+
+-- (maybeToEitherMaybe . eitherMaybeToMaybe) (Right (Identity a)) = id (Right (Identity a))
+-- eitherMaybeToMaybe (Right (Identity a)) = Just a
+-- maybeToEitherMaybe (Just a) = (Right (Identity a))     (2 same)
+-- id (Right (Identity a)) = (Right (Identity a))         (2 same)
+
+-- (eitherMaybeToMaybe . maybeToEitherMaybe) Nothing = id Nothing
+-- maybeToEitherMaybe Nothing = Left (Const ())
+-- eitherMaybeToMaybe (Left (Const ())) = Nothing         (3 same)
+-- id Nothing = Nothing                                   (3 same)
+
+-- (eitherMaybeToMaybe . maybeToEitherMaybe) (Just a) = id (Just a)
+-- maybeToEitherMaybe Nothing = Right (Identity a)
+-- eitherMaybeToMaybe (Right (Identity a)) = Just a       (4 same)
+-- id (Just a) = Just a                                   (4 same)
+
+-- with all inputs equations are true => Maybe and Maybe' the same up to isomorphism 
