@@ -103,4 +103,39 @@ eitherMaybeToMaybe (Right (Identity a)) = Just a
 -- eitherMaybeToMaybe (Right (Identity a)) = Just a       (4 same)
 -- id (Just a) = Just a                                   (4 same)
 
--- with all inputs equations are true => Maybe and Maybe' the same up to isomorphism 
+-- with all inputs equations are true => Maybe and Maybe' the same up to isomorphism
+
+--8.9.3 show that given PreList is an instance of the Bifunctor
+data PreList a b = Nil | Cons a b
+-- another time we need to prove functoriality of the type arguments separately
+instance Bifunctor PreList where
+    bimap :: (a -> d) -> (b -> c) -> PreList a b -> PreList d c
+    bimap _ _ Nil = Nil
+    bimap f g (Cons a b) = Cons (f a) (g b)
+
+    first :: (a -> d) -> PreList a b -> PreList d b
+    first f Nil = undefined
+    first f (Cons a b) = Cons (f a) b
+
+    second :: (b -> c) -> PreList a b -> PreList a c
+    second g Nil = Nil
+    second g (Cons a b) = Cons a (g b)
+
+-- preserving id
+-- bimap id id (Cons a b) =                          (1 same)
+-- Cons (id a) (id b) =
+-- Cons a b                                          (1 same)
+-- bimap id id Nil                                   (2 same)
+-- Nil                                               (2 same)
+
+-- preserving composition
+-- (bimap f g . bimap h j) (Cons a b) =
+-- bimap h j (Cons a b) = 
+-- Cons (h a) (j b)
+-- bimap f g (Cons (h a) (j b)) = 
+-- Cons ((f . h) a) ((g . j) b)
+-- bimap (f . h) (g . j) (Cons a b)
+
+-- (bimap f g . bimap h j) Nil =
+-- Nil
+-- bimap (f . h) (g . j) Nil
