@@ -139,3 +139,72 @@ instance Bifunctor PreList where
 -- (bimap f g . bimap h j) Nil =
 -- Nil
 -- bimap (f . h) (g . j) Nil
+
+--8.9.4 show that given types define a binfuntor
+data K2 c a b = K2 c
+data Fst a b = Fst a
+data Snd a b = Snd b
+
+--first one
+instance Bifunctor (K2 c) where
+    bimap :: (a -> b) -> (z -> d) -> K2 c a z -> K2 c b d
+    bimap f g (K2 c) = K2 c
+
+    first :: (a -> b) -> K2 c a z -> K2 c b z
+    first _ (K2 c) = K2 c
+
+    second :: (z -> d) -> K2 c a z -> K2 c a d
+    second _ (K2 c) = K2 c
+
+-- preserving id
+-- bimap id id (K2 c) = 
+-- K2 c                     
+
+-- preserving composition
+-- (bimap f g . bimap j k) K2 c =
+-- (bimap j k) K2 c =
+-- K2 c
+-- (bimap f g) K2 c =
+-- K2 c
+-- bimap (f . g) (j . k) (K2 c) = 
+-- K2 c
+
+-- second 
+instance Bifunctor Fst where
+    bimap :: (a -> b) -> (c -> d) -> Fst a c -> Fst b d
+    bimap f g (Fst a) = Fst $ f a
+
+    first :: (a -> b) -> Fst a c -> Fst b c
+    first f (Fst a) = Fst $ f a
+    
+    second :: (b -> c) -> Fst a b -> Fst a c
+    second g (Fst a) = Fst a
+
+-- preserving id
+-- bimap id id (Fst x) = 
+-- Fst x (
+
+-- preserving composition
+-- (bimap f g . bimap h j) Fst x =
+-- Fst $ (f . h) x =
+-- bimap (f . h) (g. j) (Fst x) 
+
+-- third
+instance Bifunctor Snd where
+    bimap :: (a -> b) -> (c -> d) -> Snd a c -> Snd b d
+    bimap f g (Snd x) = Snd $ g x
+
+    first :: (a -> b) -> Snd a c -> Snd b c
+    first f (Snd x) = Snd x
+
+    second :: (b -> c) -> Snd a b -> Snd a c
+    second g (Snd x) = Snd $ g x
+
+-- preserving id 
+-- bimap id id (Snd x) = 
+-- Snd x
+
+-- preserving composition
+-- (bimap f g . bimap h j) (Snd x) =
+-- Snd $ (g . j) x
+-- bimap (_ . _) (g . j) (Snd x) 
