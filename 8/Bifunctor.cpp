@@ -1,77 +1,50 @@
 #include "functional"
+#include "utility"
 #include "string"
 #include "iostream"
+#include <iomanip>
+
+//8.9.4
+//defining bimap for the std::pair
+template<class A, class B, class C, class D>
+std::pair<B,D> bimap(std::function<B(A)> f,
+                    std::function<D(C)> g,
+                    std::pair<A,C> m)
+{
+    return std::pair<B,D>(f(m.first), g(m.second));
+} 
 
 template<class T>
-struct Tree
+T id(T t)
 {
-    virtual ~Tree(){};
-};
-
-//leaf is identity functor - just container of the value T
-template<class T>
-struct Leaf : public Tree<T>
-{
-    T _label;
-    Leaf(T l) : _label(l) {}
-};
-
-//Node is a product type of the left and right
-//it's a bifunctor!
-template<class T>
-struct Node : public Tree<T>
-{
-    Tree<T>* _left;
-    Tree<T>* _right;
-    Node(Tree<T>* l, Tree<T>* r) : _left(l), _right(r) {} 
-};
-
-template<class A, class B>
-Tree<B>* fmap(std::function<B(A)> f, Tree<A>* t)
-{
-
-    Leaf<A>* l = dynamic_cast<Leaf<A>*>(t);
-    if(l)
-    {
-        std::cout << "Leaf finded\n";
-        return new Leaf<B>(f (l->_label));
-    }
-
-    Node<A>* n = dynamic_cast<Node<A>*>(t);
-    if(n)
-    {
-        std::cout << "Node finded\n"; 
-        return new Node<B>(fmap<A,B>(f, n->_left), fmap<A,B>(f, n->_right));
-    } 
- 
-    return nullptr;
-};
+    return t;
+}
 
 int main()
 {
-    using TreeI = Tree<int>;
-    using LeafI = Leaf<int>;
-    using NodeI = Node<int>;
+    std::pair<int, std::string> p{20, "hello"};
 
-    TreeI* L1 = new LeafI(20);
-    TreeI* L2 = new LeafI(25);
-    TreeI* L3 = new LeafI(30);
-    TreeI* L4 = new LeafI(35);
+    auto f = [](int a){ return static_cast<float>(a); };
+    auto g = [](std::string s){ return s.empty(); };
+    auto p2 = bimap<int, float, std::string, bool>(f, g, p);
+    //std::cout << p2.first << " <- float, " << p2.second << " <- bool" << std::endl;
 
-    TreeI* N1 = new NodeI(L1, L2);
-    TreeI* N2 = new NodeI(L3, L4);
-    TreeI* N3 = new NodeI(N1, N2);
+    //test that bimap preserve identity
+    auto idI = id<int>;
+    auto idS = id<std::string>;
+    auto p3 = bimap<int, int, std::string, std::string>(idI, idS, p);
+    if(p == p3){ std::cout << "Identity preserved, bimap(id, id, p) == p" << std::endl;}
 
-    fmap<int, std::string>([](int x){
-        std::string s = std::to_string(x);
-        std::cout << s << std::endl;
-        return s;
-    }, N3);
+    //test that bimap preserves composition
+    auto f2 = [](float f){return static_cast<double>(f);};
+    auto g2 = [](bool b){return static_cast<int>(b); };
 
-    return 0;
+    auto fComp = [&](int i){ return f2(f(i));};
+    auto gComp = [&](std::string s){return g2(g(s)); };
+    
+    auto composed = bimap<int, double, std::string, int>(fComp, gComp, p);
+
+    auto bimapFirst = bimap<int, float, std::string, bool>(f, g, p);
+    auto bimapSecond = bimap<float, double, bool, int>(f2, g2, bimapFirst);
+    if(composed == bimapSecond){ std::cout << "Composition preserved, bimap((f2 . f), (g2 . g), p) == (bimap(f2, g2) . bimap(f, g)) p" << std::endl;}
 }
-
-// haskell implementation for comparison
-// instance Functor Tree where
-//     fmap f (Leaf a) = Leaf (f a)
-//     fmap f (Node a b) = Node (fmap f a) (fmap f b)
