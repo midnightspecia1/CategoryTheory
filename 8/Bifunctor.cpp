@@ -2,6 +2,7 @@
 #include "utility"
 #include "string"
 #include "iostream"
+#include <map>
 #include <iomanip>
 
 //8.9.4
@@ -19,6 +20,12 @@ T id(T t)
 {
     return t;
 }
+
+//8.9.5 should std::map consider a bifunctor or profunctor
+//I think std::map is the functor because it is list of the pairs
+//so basicly it's a functor and bifunctor inside
+//somehow we need to put inside the list functor f and g to apply them to the pair binfunctor
+ 
 
 int main()
 {
