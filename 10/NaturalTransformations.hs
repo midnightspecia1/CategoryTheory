@@ -91,3 +91,16 @@ predToStr (Op f) = Op (\x -> if f x then "True" else "False")
 -- 2 level: categories where objects is the categories themselfs and morphisms are functors (Cat), homeset in Cat are a set of functors Cat
 -- Cat(C,D) - set of functors from C to D
 -- 3 level: functor cat [C,D] is also a set of functors with natural tranformations between them as morphisms
+
+--10.6.1 defined natural tranformation from Maybe to List Functor
+some :: Maybe a -> [a]
+some Nothing = []
+some (Just x) = [x]
+
+-- fmapG f . some = some . fmapF f
+-- fmapG f (some Nothing) = fmapG f [] = []
+-- some (fmapF f Nothing) = some Nothing = []
+
+-- fmapG f (some (Just x)) = fmapG f [x] = [(f x)]
+-- some (fmapF f (Just x)) = some (Just (f x)) = [(f x)]
+-- naturality condition proved
