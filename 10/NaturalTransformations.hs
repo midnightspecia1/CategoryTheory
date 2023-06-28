@@ -104,3 +104,22 @@ some (Just x) = [x]
 -- fmapG f (some (Just x)) = fmapG f [x] = [(f x)]
 -- some (fmapF f (Just x)) = some (Just (f x)) = [(f x)]
 -- naturality condition proved
+
+--10.6.2 two different natural transformation between Reader () and [] functors
+
+natTransformOne :: Reader () a -> [a]
+natTransformOne (Reader g) = [g ()]
+
+natTransformTwo :: Reader () a -> [a]
+natTransformTwo (Reader g) = []
+
+--10.6.3 made it with Reader Bool and Maybe
+
+natTransformThree :: Reader Bool a -> Maybe a
+natTransformThree (Reader g) = Nothing
+
+natTransformFour :: Reader Bool a -> Maybe a
+natTransformFour (Reader g) = Just (g True)
+
+natTransformFive :: Reader Bool a -> Maybe a
+natTransformFive (Reader g) = Just (g False)
