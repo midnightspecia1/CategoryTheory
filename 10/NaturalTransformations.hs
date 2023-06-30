@@ -54,9 +54,13 @@ scam :: Const Int a -> Maybe a
 scam (Const _) = Nothing
 
 -- Reader big role in Yonneda lemma
-newtype Reader e a = Reader (e -> a)
+newtype Reader r a = Reader (r -> a)
+
+runR :: Reader r a -> r -> a
+runR (Reader f) x = f x
 
 instance Functor (Reader e) where
+    fmap :: (a -> b) -> Reader e a -> Reader e b
     fmap f (Reader g) = Reader (\x -> f (g x))
 -- for every type e we can define a family of natural tranformations from Reader e to any functor f
 
@@ -72,12 +76,24 @@ obvios (Reader g) = Just (g ())
 
 newtype Op r a = Op (a -> r)
 
+runOp :: Op r a -> a -> r
+runOp (Op f) x = f x
+
 instance Contravariant (Op r) where
     contramap :: (b -> a) -> Op r a -> Op r b
     contramap f (Op g) = Op (\x -> g (f x))
 
+
 predToStr :: Op Bool a -> Op String a
 predToStr (Op f) = Op (\x -> if f x then "True" else "False")
+
+ope :: Op Bool Int
+ope = Op (\x -> x == 10)
+
+-- a = contramap f ope
+
+-- f :: Int -> Bool
+-- f x = x == 10
 -- those functors are not covariants that is not natural transformation in Hask cat
 -- but it is in opposite cat, and there is a opposite natuaral condition
 -- contramap f . predToStr = predToStr . contramap f
@@ -97,6 +113,9 @@ some :: Maybe a -> [a]
 some Nothing = []
 some (Just x) = [x]
 
+sF :: Int -> Bool
+sF i = i == 0
+
 -- fmapG f . some = some . fmapF f
 -- fmapG f (some Nothing) = fmapG f [] = []
 -- some (fmapF f Nothing) = some Nothing = []
@@ -107,19 +126,64 @@ some (Just x) = [x]
 
 --10.6.2 two different natural transformation between Reader () and [] functors
 
-natTransformOne :: Reader () a -> [a]
-natTransformOne (Reader g) = [g ()]
-
-natTransformTwo :: Reader () a -> [a]
-natTransformTwo (Reader g) = []
+alfa :: Reader () a -> [a]
+alfa (Reader g) = [g ()] 
+ 
+betta :: Reader () a -> [a]
+betta (Reader g) = []
 
 --10.6.3 made it with Reader Bool and Maybe
 
-natTransformThree :: Reader Bool a -> Maybe a
-natTransformThree (Reader g) = Nothing
+gamma :: Reader Bool a -> Maybe a
+gamma (Reader g) = Nothing
 
-natTransformFour :: Reader Bool a -> Maybe a
-natTransformFour (Reader g) = Just (g True)
+delta :: Reader Bool a -> Maybe a
+delta (Reader g) = Just (g True)
 
-natTransformFive :: Reader Bool a -> Maybe a
-natTransformFive (Reader g) = Just (g False)
+epsilon :: Reader Bool a -> Maybe a
+epsilon (Reader g) = Just (g False)
+
+tetta :: Reader Bool a -> Reader String a
+tetta (Reader g) = Reader (\x -> g True)
+
+tF :: Bool -> String
+tF True = "String"
+tF False = "False"
+
+t1 :: Reader String String
+t1 = fmap tF . tetta $ (Reader not)
+
+t2 :: Reader String String
+t2 = tetta . fmap tF $ (Reader not)
+
+--10.6.6 
+-- predToStr :: Op Bool a -> Op String a
+-- predToStr (Op f) = Op (\x -> if f x then "True" else "False")
+
+-- instance Contravariant (Op r) where
+--     contramap :: (b -> a) -> Op r a -> Op r b
+--     contramap f (Op g) = Op (\x -> g (f x))
+
+--newtype Reader r a = Reader (r -> a)
+--newtype Op r a     = Op (a -> r)
+
+op :: Op Bool Int
+op = Op (\x -> x > 0)
+
+f :: String -> Int
+f x = read x
+
+--contramap :: (String -> Int) -> Op r Int -> Op r String
+a :: Op String String
+a = zeta . contramap f $ op
+
+b :: Op String String
+b = contramap f . zeta $ op
+
+zeta :: Op Bool a -> Op String a
+zeta (Op g) = Op (\x -> if g x then "T" else "F")
+
+testNatCond :: Bool
+testNatCond = let one = runOp a "1"
+                  two = runOp b "1"
+              in one == two 
